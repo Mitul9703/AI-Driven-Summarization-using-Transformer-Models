@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PDF Upload and Display</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="main">
+      <div class="upload container">
+        <h1>Upload a PDF File</h1>
+
+        <div class="DragDrop">
+          <form method="POST" enctype="multipart/form-data" action="/upload">
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+              "
+            >
+              <div class="drop-zone">
+                <span class="drop-zone__prompt"
+                  >Drop a PDF file here or click to upload</span
+                >
+                <input
+                  type="file"
+                  name="pdf_file"
+                  class="drop-zone__input"
+                  accept=".pdf"
+                  required
+                  style="display: none"
+                />
+                <div class="file-name"></div>
+                <!-- This is correctly placed to display the file name -->
+              </div>
+            </div>
+            <input type="submit" value="Upload and Display" />
+          </form>
+        </div>
+      </div>
+      <div class="summary">
+        <div id="typewriter" class="scrollable-container">
+          {% if text %}
+          <h2>Summary Text:</h2>
+          <div id="summary-text">{{ text|safe }}</div>
+          <a href="{{ url_for('upload', filename=pdf_file.filename) }}" download
+            >Download Original PDF</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="../static/main.js"></script>
+    <script>
+      const typewriter = document.getElementById("typewriter");
+      const summaryText = document.getElementById("summary-text").textContent; // Get the plain text content
+
+      let index = 0;
+      let outputText = ""; // Initialize the output text
+
+      function type() {
+        if (index < summaryText.length) {
+          // Append the current character to the output text
+          outputText += summaryText[index];
+
+          // Replace newlines with line breaks to respect line breaks in the text
+          if (summaryText[index] === "\n") {
+            outputText += "<br>";
+          }
+
+          typewriter.innerHTML =
+            outputText + '<span class="blinking-cursor">|</span>';
+          index++;
+          setTimeout(type, 1); // Adjust the timeout as desired
+        } else {
+          typewriter.innerHTML =
+            outputText + '<span class="blinking-cursor">|</span>';
+        }
+      }
+
+      // Start typing
+      type();
+    </script>
+  </body>
+</html>
